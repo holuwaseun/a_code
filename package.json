@@ -1,0 +1,25 @@
+{
+  "name": "andela_student-resource",
+  "version": "1.0.0",
+  "description": "node bases web server that handles CRUD operation",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Samueltommzy/Andela_student-resource.git"
+  },
+  "author": "Ologunowa Samuel (Tommzy)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Samueltommzy/Andela_student-resource/issues"
+  },
+  "homepage": "https://github.com/Samueltommzy/Andela_student-resource#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.1",
+    "mongoose": "^4.12.0",
+    "morgan": "^1.9.0"
+  }
+}
