@@ -4,6 +4,7 @@ let morgan = require('morgan');
 let mongoose = require('mongoose')
 let methodOverride = require('method-override');
 let db = require('./config/database');
+let  cors = require('cors');
 
 
 mongoose.connect(db.database,function(err){
