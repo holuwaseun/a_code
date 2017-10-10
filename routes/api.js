@@ -8,3 +8,16 @@ function createToken(user){
     })
     return token;
 }
+
+module.exports  = function(app, express,socket_io){
+    let api = express.Router();
+  // CREATE  Student Endpoint
+      api.post("/student/create", (request, response) => {
+        const studentObj = {
+            fullName: request.body.fullName,
+            email: request.body.email,
+            userName: request.body.userName,
+            password: request.body.password,
+            institution: request.body.institution
+        }
+      }}
