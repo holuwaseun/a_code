@@ -23,3 +23,6 @@ app.listen(port, function(){
         console.log("app listening on port " + port)
     }
 );
+app.use("/",(req,res) =>{
+    res.sendFile(__dirname + "/index.html")
+})
