@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 let Schema = mongoose.Schema;
 const studentSchema = new Schema({
-    fullName :{ type: String,required: false},
+    firstName :{ type: String,required: false},
+    lastName :{ type: String,required: false},
     email:{type: String,required: true},
     userName :{type: String,required:true},
     password:{type: String, required: true, select: false, minlength: [6, "The password is too short, minimum length is {MINLENGTH}"]},
