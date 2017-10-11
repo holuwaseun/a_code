@@ -1,5 +1,5 @@
 const Student = require('../Model/student.js')
-const Config = require('./config/database.js')
+const Config = require('../config/database.js')
 const jsonwebtoken = require('jsonwebtoken')
 const secret_key = Config.secret_key;
 function createToken(user){
@@ -12,7 +12,7 @@ function createToken(user){
 module.exports  = function(app, express,socket_io){
     let api = express.Router();
   // CREATE  Student Endpoint
-      api.post("/student/create", (request, response) => {
+      api.post("createStudent", (request, response) => {
         const studentObj = {
             fullName: request.body.fullName,
             email: request.body.email,
