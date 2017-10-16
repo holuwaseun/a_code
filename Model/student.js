@@ -32,5 +32,5 @@ userSchema.methods.passwordCheck = function(password) {
     let user = this
     return bcrypt.compareSync(password, user.password)
 }
-module.exports = mongoose.model("User", studentSchema)
+module.exports = mongoose.model("Student, studentSchema)
 
