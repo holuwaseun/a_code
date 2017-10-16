@@ -1,4 +1,5 @@
 const Student = require('../Model/student')
+const Session = require('../Model/session')
 const Config = require('../config/database.js')
 const jsonwebtoken = require('jsonwebtoken')
 const secret_key = Config.secret_key;
@@ -73,9 +74,9 @@ module.exports  = function(app, express,socket_io){
                     message: "Student doesn't exist, please try again"
                 })
             } else if (student) {
-                let validPassword = user.passwordCheck(userObj.password)
-
-                if (!validPassword) {
+                 let validPassword = user.passwordCheck(userObj.password)
+            
+                 if (!validPassword) {
                     response.status(200).send({
                         status: 200,
                         success: false,
@@ -89,22 +90,23 @@ module.exports  = function(app, express,socket_io){
                         lastName: student.lastName,
                         department:student.department,
                     }
-                    const student_token = createToken(token_obj)
+                
+                    const student_token = createToken(token_obj);
 
-                    if (user.user_type === 'user') {
-                        Session.findOne({}, (err, session) => {
+                    //if (student.user_type === 'user') {
+                        Session.findOne({}, (err, session) => {                                                
                             if (err) {
                                 response.status(200).send({
                                     status: 200,
                                     success: false,
                                     message: "An error occured, please try again",
-                                    error_message: err.message
-                                })
+                                    error_message: err.message            
+                                })                                                                                                       
                                 return
                             }
 
                             if (!session) {
-                                let new_session = new Session({ user_logged: true,user_id: null })
+                                let new_session = new Session({ student_logged: true,student_id: null })
                                 new_session.save((err, savedSession) => {
                                     if (err) {
                                         response.status(200).send({
@@ -119,12 +121,12 @@ module.exports  = function(app, express,socket_io){
                                         status: 200,
                                         success: true,
                                         message: "Login was successful",
-                                        token: user_token,
-                                        data: user
+                                        token: student_token,
+                                        data: student
                                     })
                                 })
                             } else {
-                                session.user_logged = true
+                                session.student_logged = true
                                 session.save((err, savedSession) => {
                                     if (err) {
                                         response.status(200).send({
@@ -140,14 +142,12 @@ module.exports  = function(app, express,socket_io){
                                         status: 200,
                                         success: true,
                                         message: "Login was successful",
-                                        token: user_token,
-                                        data: user
+                                        token: student_token,
+                                        data: student
                                     })
-                                })
-                            }
-
-                        })
+                                })}})}}})})
+                                                                                                                                                                                     
 
     return api;
-      };
-    
+             
+}
