@@ -14,23 +14,23 @@ const studentSchema = new Schema({
     level: {type: Number,required: false},     
     available:{type: Boolean,default:true},
 })
-userSchema.pre("save", function(next) {
-    let user = this
-    if (!user.isModified("password")) {
+studentSchema.pre("save", function(next) {
+    let student = this
+    if (!student.isModified("password")) {
         return next()
     }
-   //console.log(user.password)
-    bcrypt.hash(user.password, null, null, function(err, hash) {
+   console.log(student.password);
+    bcrypt.hash(student.password, null, null, function(err, hash) {
         if (err) {
             return next(err)
         }
-        user.password = hash;
+    student.password = hash;
         next()
     })
 })
-userSchema.methods.passwordCheck = function(password) {
-    let user = this
-    return bcrypt.compareSync(password, user.password)
+studentSchema.methods.passwordCheck = function(password) {
+    let student = this
+    return bcrypt.compareSync(password, student.password)
 }
-module.exports = mongoose.model("Student, studentSchema)
+module.exports = mongoose.model("Student", studentSchema)
 
