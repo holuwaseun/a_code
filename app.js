@@ -7,18 +7,14 @@ let db = require('./config/database');
 let http = require("http").Server(app);
 let socket_io = require('socket.io')(http);
 let  cors = require('cors');
-
-
-
 mongoose.connect(db.database,function(err){
     if(err){
-        console.log("connection to database failed")
+        console.log("connection to database failed");
     }
     else{
     console.log("Connected to database" +  db.database);
 }});
-
-let port = 8080;
+let port = 3000
 var app = express();
 mongoose.connect()
  
@@ -34,8 +30,10 @@ http.listen(port, function(err){
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan("dev"));
+app.use('/scripts', express.static(`${__dirname }/node_modules`))
 var api = require("./routes/api")(app, express,socket_io);
 app.use("/api", api);
+
 // app.use("/",(req,res) =>{
 //     res.sendFile(__dirname + "/index.html")
 // })
