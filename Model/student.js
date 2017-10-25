@@ -1,17 +1,17 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
-let Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 const studentSchema = new Schema({
-    firstName :{ type: String,required: false},
-    lastName :{ type: String,required: false},
-    email:{type: String,required: true},
+    firstName :{type: String,required:false},
+    lastName : {type: String,required: false},
+    email:{type: String,required:true},
     userName :{type: String,required:true},
     password:{type: String, required: true, select: false, minlength: [6, "The password is too short, minimum length is {MINLENGTH}"]},
     date_joined:{ type: Date, default: Date.now},
-    institution:{type: String, required: false},
-    Department: {type: String,required: true},
+    //institution:{type: String,required:false},
+    department: {type: String,required: true},
     courses_registered: {type: Array,required: false},
-    level: {type: Number,required: false},     
+    //level: {type: Number,required: false},     
     available:{type: Boolean,default:true},
 })
 studentSchema.pre("save", function(next) {
@@ -30,7 +30,7 @@ studentSchema.pre("save", function(next) {
 })
 studentSchema.methods.passwordCheck = function(password) {
     let student = this
-    return bcrypt.compareSync(password, student.password)
+    return bcrypt.compareSync(password, student.password);
 }
-module.exports = mongoose.model("Student", studentSchema)
+module.exports = mongoose.model("Student", studentSchema);
 
