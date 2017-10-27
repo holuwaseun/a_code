@@ -1,30 +1,31 @@
+"use strict"
 const Student = require('../Model/student')
 const Session = require('../Model/session')
 const Config = require('../config/database.js')
 const jsonwebtoken = require('jsonwebtoken')
 const secret_key = Config.secret_key;
-function createToken(user){
-    const token = jsonwebtoken.sign(Student,secret_key, {
+
+    function createToken(student){
+    const token = jsonwebtoken.sign(student,secret_key, {
         expiresIn : 1234567
     })
     return token;
 }
-
 module.exports  = function(app, express,socket_io){
     let api = express.Router();
-  // CREATE  Student Endpoint 
-    api.post("/api/create", (request, response) => {
-            const studentObj = {
+  // CREATE User Endpoint
+      api.post("/student/create", (request, response) => {
+        const studentObj = {
             firstName: request.body.firstName,
             lastName: request.body.lastName,
             email: request.body.email,
             userName: request.body.userName,
             password: request.body.password,
-            lastName: request.body.lastName,
             department: request.body.department
         }
-
-        Student.find({ firstName: studentObj.firstName, lastName : studentObj.lastName, available: true }, (err, students) => {
+    console.log(studentObj);
+        const student = new Student(studentObj)
+        student.save((err, savedUser) => {
             if (err) {
                 response.status(200).send({
                     status: 403,
@@ -34,41 +35,19 @@ module.exports  = function(app, express,socket_io){
                 })
                 return
             }
+            response.status(200).send({
+                status: 200,
+                success: true,
+                message: "Student created successfully",
+                student_data: savedUser
+            })
 
-            if (students && students.length > 0) {
-                response.status(200).send({
-                    status: 200,
-                    success: false,
-                    message: "This name already exists, please try again"
-                })
-            } else {
-                const student = new Student(studentObj)
-
-                student.save((err, savedStudent) => {
-                    if (err) {
-                        response.status(200).send({
-                            status: 403,
-                            success: false,
-                            message: "Error occured",
-                            error_message: err.message
-                        })
-                        return
-                    }
-
-                    response.status(200).send({
-                        status: 200,
-                        success: true,
-                        message: "Student added successfully",
-                        student_data: savedStudent
-                    })
-                })
-            }
         })
-    })
+    }) 
 
     //authentication or login endpoint
 
-    api.post("api/login", (request, response) => {
+    api.post("/student/login", (request, response) => {
           const userObj = {
             userName: request.body.username,
             password: request.body.password,
@@ -94,7 +73,7 @@ module.exports  = function(app, express,socket_io){
                     message: "Student doesn't exist, please try again"
                 })
             } else if (student) {
-                 let validPassword = user.passwordCheck(userObj.password)
+                 let validPassword = student.passwordCheck(userObj.password)
             
                  if (!validPassword) {
                     response.status(200).send({
@@ -104,8 +83,8 @@ module.exports  = function(app, express,socket_io){
                     })
                 } else {
                     token_obj = {
-                        _id: user._id,
-                        username: student.userName,
+                        _id: student._id,
+                        userName: student.userName,
                         firstName:student.firstName,
                         lastName: student.lastName,
                         department:student.department,
@@ -170,6 +149,34 @@ module.exports  = function(app, express,socket_io){
                             )}
                         }})
                     })
+                    api.use((request, response, next) => {
+        let token = request.body.token || request.query.token || request.headers['x-access-token']
+
+        if (!token) {
+            response.status(200).send({
+                status: 403,
+                success: false,
+                message: "No valid student token found"
+            })
+            return
+        } else {
+            jsonwebtoken.verify(token, secret_key, (err, decoded) => {
+                if (err) {
+                    response.status(200).send({
+                        status: 403,
+                        success: false,
+                        message: "Error occured",
+                        error_message: err.message
+                    })
+                    return
+                }
+
+                request.decoded = decoded
+
+                next()
+            })
+        }
+    })
 
           /* Update Student Endpoint   */
         api.put("/api/update", (request, response) => {
