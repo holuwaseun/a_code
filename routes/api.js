@@ -54,13 +54,12 @@ module.exports = function(app, express, socket_io) {
 
     api.post("/student/login", (request, response) => {
         const userObj = {
-            userName: request.body.username,
-            password: request.body.password,
-            department: request.body.department
+            userName: request.body.userName,
+            password: request.body.password
         }
         console.log(userObj);
         let token_obj = {}
-        Student.findOne({ userName: userObj.userName, available: true, department: userObj.department }, 'department userName password fullName', (err, user) => {
+        Student.findOne({ userName: userObj.userName, available: true }, 'department userName password fullName', (err, student) => {
             if (err) {
                 response.status(200).send({
                     status: 200,
@@ -68,7 +67,7 @@ module.exports = function(app, express, socket_io) {
                     message: "An error occured, please try again",
                     error_message: err.message
                 });
-                return
+                return false;
             }
 
             if (!student) {
@@ -105,8 +104,8 @@ module.exports = function(app, express, socket_io) {
                                 success: false,
                                 message: "An error occured, please try again",
                                 error_message: err.message
-                            })
-                            return
+                            });
+                            return false;
                         }
 
                         if (!session) {
@@ -118,8 +117,8 @@ module.exports = function(app, express, socket_io) {
                                         success: false,
                                         message: "An error occured, please try again",
                                         error_message: err.message
-                                    })
-                                    return
+                                    });
+                                    return false;
                                 }
                                 response.status(200).json({
                                     status: 200,
@@ -127,10 +126,10 @@ module.exports = function(app, express, socket_io) {
                                     message: "Login was successful",
                                     token: student_token,
                                     data: student
-                                })
-                            })
+                                });
+                            });
                         } else {
-                            session.student_logged = true
+                            session.student_logged = true;
                             session.save((err, savedSession) => {
                                 if (err) {
                                     response.status(200).send({
@@ -138,8 +137,8 @@ module.exports = function(app, express, socket_io) {
                                         success: false,
                                         message: "An error occured, please try again",
                                         error_message: err.message
-                                    })
-                                    return
+                                    });
+                                    return false;
                                 }
 
                                 response.status(200).json({
@@ -148,13 +147,13 @@ module.exports = function(app, express, socket_io) {
                                     message: "Login was successful",
                                     token: student_token,
                                     data: student
-                                })
-                            })
+                                });
+                            });
                         }
-                    })
+                    });
                 }
             }
-        })
+        });
     });
 
     api.use((request, response, next) => {
