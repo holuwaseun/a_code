@@ -25,6 +25,7 @@ module.exports = function(app, express, socket_io) {
             email: request.body.email,
             userName: request.body.userName,
             password: request.body.password,
+            _student_id:request.body._student_id,
             department: request.body.department
         };
 
@@ -59,7 +60,7 @@ module.exports = function(app, express, socket_io) {
         }
         console.log(userObj);
         let token_obj = {}
-        Student.findOne({ userName: userObj.userName, available: true }, 'department userName password fullName', (err, student) => {
+        Student.findOne({ userName: userObj.userName, available: true }, 'department userName password firstName', (err, student) => {
             if (err) {
                 response.status(200).send({
                     status: 200,
@@ -92,6 +93,7 @@ module.exports = function(app, express, socket_io) {
                         firstName: student.firstName,
                         lastName: student.lastName,
                         department: student.department,
+                        student_id: student._student_id
                     }
 
                     const student_token = createToken(token_obj);
@@ -154,7 +156,7 @@ module.exports = function(app, express, socket_io) {
                 }
             }
         });
-    });
+});
 
     api.use((request, response, next) => {
         let token = request.body.token || request.query.token || request.headers['x-access-token']
@@ -185,7 +187,74 @@ module.exports = function(app, express, socket_io) {
         }
     });
 
+    /**Retrieve student endpoint */
+
+      api.get("/student", (request, response) => {
+        let student = request.decoded
+        Student.findOne({ _student_id: student._id, available: true }).populate({
+                path: '_student_id',
+                match: { available: true }
+            }).exec((err, student) => {
+                if (err) {
+                    response.status(200).send({
+                        status: 403,
+                        success: false,
+                        message: "Error occured",
+                        error_message: err.message
+                    })
+                    return
+                }
+
+                let student_data = {
+                    _id: student._student_id._id,
+                    firstName: student.firstName,
+                    lastName: student.lastName,
+                    email: student.email,
+                    userName: student._student_id.userName
+                }
+
+                response.status(200).send({
+                    status: 200,
+                    success: true,
+                    message: "Student data loaded",
+                    student_data: student_data
+                })
+            });
+        } );
+        /**Retrieve all students endpoint */
+        api.get("/students", (request, response) => {
+        let student = request.decoded
+        Student.find({ available: true }).exec((err, student) => {
+                if (err) {
+                    response.status(200).send({
+                        status: 403,
+                        success: false,
+                        message: "Error occured",
+                        error_message: err.message
+                    })
+                    return
+                }
+
+                let student_data = {
+                    _id: student._student_id._id,
+                    firstName: student.firstName,
+                    lastName: student.lastName,
+                    email: student.email,
+                    userName: student._student_id.userName
+                }
+
+                response.status(200).send({
+                    status: 200,
+                    success: true,
+                    message: "Student data loaded",
+                    student_data: student_data
+                })
+            });
+        } );
+
+
     /* Update Student Endpoint   */
+
     api.put("/api/update", (request, response) => {
         const _student_id = request.body._student_id;
 
@@ -212,7 +281,7 @@ module.exports = function(app, express, socket_io) {
                     message: "Trying to edit a non-existing student"
                 });
             } else {
-                student.firstName = studentObj.fullname;
+                student.firstName = studentObj.firstName;
                 student.lastName = studentObj.lastName;
 
                 student.save((err, savedStudent) => {
