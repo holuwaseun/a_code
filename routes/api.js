@@ -25,7 +25,6 @@ module.exports = function(app, express, socket_io) {
             email: request.body.email,
             userName: request.body.userName,
             password: request.body.password,
-            _student_id:request.body._student_id,
             department: request.body.department
         };
 
@@ -156,7 +155,7 @@ module.exports = function(app, express, socket_io) {
                 }
             }
         });
-});
+    });
 
     api.use((request, response, next) => {
         let token = request.body.token || request.query.token || request.headers['x-access-token']
@@ -189,72 +188,56 @@ module.exports = function(app, express, socket_io) {
 
     /**Retrieve student endpoint */
 
-      api.get("/student", (request, response) => {
+    api.get("/student", (request, response) => {
         let student = request.decoded
         Student.findOne({ _id: student._id, available: true }).populate({
-                path: '_id',
-                match: { available: true }
-            }).exec((err, student) => {
-                if (err) {
-                    response.status(200).send({
-                        status: 403,
-                        success: false,
-                        message: "Error occured",
-                        error_message: err.message
-                    })
-                    return
-                }
-
-                let student_data = {
-                    _id: student._id,
-                    firstName: student.firstName,
-                    lastName: student.lastName,
-                    email: student.email,
-                    userName: student._id.userName
-                }
-
+            path: '_id',
+            match: { available: true }
+        }).exec((err, student) => {
+            if (err) {
                 response.status(200).send({
-                    status: 200,
-                    success: true,
-                    message: "Student data loaded",
-                    student_data: student_data
-                })
+                    status: 403,
+                    success: false,
+                    message: "Error occured",
+                    error_message: err.message
+                });
+                return false;
+            }
+
+            response.status(200).send({
+                status: 200,
+                success: true,
+                message: "Student data loaded",
+                student_data: student
             });
-        } );
-        /**Retrieve all students endpoint */
-        api.get("/students", (request, response) => {
-        let student = request.decoded
-        Student.find({ available: true }).exec((err, student) => {
-                if (err) {
-                    response.status(200).send({
-                        status: 403,
-                        success: false,
-                        message: "Error occured",
-                        error_message: err.message
-                    })
-                    return
-                }
+        });
+    });
 
-                let student_data = {
-                    _id: student._id,
-                    firstName: student.firstName,
-                    lastName: student.lastName,
-                    email: student.email,
-                    //userName: student._id.userName
-                }
-
+    /**Retrieve all students endpoint */
+    api.get("/students", (request, response) => {
+        let student = request.decoded;
+        Student.find({ available: true }).exec((err, students) => {
+            if (err) {
                 response.status(200).send({
-                    status: 200,
-                    success: true,
-                    message: "Student data loaded",
-                    student_data: student_data
-                })
+                    status: 403,
+                    success: false,
+                    message: "Error occured",
+                    error_message: err.message
+                });
+                return false;
+            }
+
+            response.status(200).send({
+                status: 200,
+                success: true,
+                message: "Student data loaded",
+                student_data: students
             });
-        } );
+        });
+    });
 
 
     /* Update Student Endpoint   */
-
     api.put("/api/update", (request, response) => {
         const _student_id = request.body._student_id;
 
@@ -364,4 +347,4 @@ module.exports = function(app, express, socket_io) {
     });
 
     return api;
-}
+};
