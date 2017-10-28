@@ -191,8 +191,8 @@ module.exports = function(app, express, socket_io) {
 
       api.get("/student", (request, response) => {
         let student = request.decoded
-        Student.findOne({ _student_id: student._id, available: true }).populate({
-                path: '_student_id',
+        Student.findOne({ _id: student._id, available: true }).populate({
+                path: '_id',
                 match: { available: true }
             }).exec((err, student) => {
                 if (err) {
@@ -206,11 +206,11 @@ module.exports = function(app, express, socket_io) {
                 }
 
                 let student_data = {
-                    _id: student._student_id._id,
+                    _id: student._id,
                     firstName: student.firstName,
                     lastName: student.lastName,
                     email: student.email,
-                    userName: student._student_id.userName
+                    userName: student._id.userName
                 }
 
                 response.status(200).send({
@@ -236,11 +236,11 @@ module.exports = function(app, express, socket_io) {
                 }
 
                 let student_data = {
-                    _id: student._student_id._id,
+                    _id: student._id,
                     firstName: student.firstName,
                     lastName: student.lastName,
                     email: student.email,
-                    userName: student._student_id.userName
+                    //userName: student._id.userName
                 }
 
                 response.status(200).send({
