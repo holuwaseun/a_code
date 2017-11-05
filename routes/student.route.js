@@ -22,16 +22,29 @@ module.exports = (express, socket_io) => {
             password: request.body.password
         };
 
-        const student = new StudentModel(studentObj);
-
-        student.save((err, document) => {
+        StudentModel.find({ userName: studentObj.userName, available: true }).exec((err, documents) => {
             if (err) return next(err);
 
-            response.status(200).send({
-                status: 200,
-                success: true,
-                message: "Student created successfully",
-                data: document
+            if (documents && documents.length) {
+                response.status(200).send({
+                    status: 200,
+                    success: false,
+                    message: "The username specified is already taken, please try again"
+                });
+                return false;
+            }
+
+            const student = new StudentModel(studentObj);
+            
+            student.save((err, document) => {
+                if (err) return next(err);
+    
+                response.status(200).send({
+                    status: 200,
+                    success: true,
+                    message: "Student created successfully",
+                    data: document
+                });
             });
         });
     });
@@ -44,8 +57,6 @@ module.exports = (express, socket_io) => {
             userName: request.body.userName,
             password: request.body.password
         };
-
-        console.log(userObj);
         
         StudentModel.findOne({ userName: userObj.userName, available: true }).exec((err, document) => {
             if (err) return next(err);
@@ -58,8 +69,6 @@ module.exports = (express, socket_io) => {
                 })
                 return false;
             }
-
-            console.log(document);
             
             document.passwordCheck(userObj.password, (err, isMatch) => {
                 if (err) return next(err);

@@ -70,6 +70,30 @@ module.exports = (express, socket_io) => {
         });
     });
 
+    /*
+    * RETRIEVE all courses for a department and level endpoint
+    */
+    courseRoute.get("/retrieve/department/:_departmentId/level/:_levelId", (request, response, next) => {
+        const filterObj = {
+            _departmentId: request.params._departmentId,
+            _levelId: request.params._levelId,
+            available: true
+        };
+        CourseModel.find(filterObj).populate({
+            pathe: "_departmentId _levelId",
+            match: { available: true }
+        }).exec((err, documents) => {
+            if (err) return next(err);
+
+            response.status(200).send({
+                status: 200,
+                success: true,
+                message: "Course data loaded",
+                data: documents
+            });
+        });
+    });
+
 
     /*
     * UPDATE course endpoint
