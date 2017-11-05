@@ -4,18 +4,17 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 const Schema = mongoose.Schema;
 
-const studentSchema = new Schema({
-   // _student_id :{type: Number, required: true},
+let studentSchema = new Schema({
+    _departmentId: { type: Schema.ObjectId, required: true, ref: "Department" },
+    _levelId: { type: Schema.ObjectId, required: true, ref: "Level" },
+    matricNumber: { type: String, required: true },
     firstName: { type: String, required: false },
     lastName: { type: String, required: false },
     email: { type: String, required: true },
     userName: { type: String, required: true },
-    password: { type: String, required: true, select: false, minlength: [6, "The password is too short, minimum length is {MINLENGTH}"] },
-    date_joined: { type: Date, default: Date.now },
-    //institution:{type: String,required:false},
-    department: { type: String, required: true },
-    courses_registered: { type: Array, required: false },
-    //level: {type: Number,required: false},     
+    password: { type: String, required: true, minlength: [6, "The password is too short, minimum length is {MINLENGTH}"] },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
     available: { type: Boolean, default: true }
 });
 
@@ -34,10 +33,14 @@ studentSchema.pre("save", function(next) {
     });
 });
 
-studentSchema.methods.passwordCheck = function(password) {
+studentSchema.methods.passwordCheck = function(password, callback) {
     let student = this;
 
-    return bcrypt.compareSync(password, student.password);
+    bcrypt.compare(password, student.password, (err, isMatch) => {
+        if (err) return callback(err);
+
+        callback(null, isMatch);
+    });
 }
 
 module.exports = mongoose.model("Student", studentSchema);

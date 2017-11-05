@@ -1,23 +1,25 @@
 "use strict";
 
-let express = require('express');
-let bodyParser = require('body-parser');
-let morgan = require('morgan');
-let mongoose = require('mongoose');
-let methodOverride = require('method-override');
-let db = require('./config/database');
-var app = express();
+const express = require('express');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
+const mongoose = require('mongoose');
+const methodOverride = require('method-override');
+const { database, databaseName } = require('./config/database');
+const cors = require('cors');
+
+let app = express();
+
 let http = require("http").Server(app);
 let socket_io = require('socket.io')(http);
-let cors = require('cors');
 
 app.use(cors());
 
-mongoose.connect(db.database, function(err) {
+mongoose.connect(database, function(err) {
     if (err) {
         console.log("connection to database failed");
     } else {
-        console.log(" Connected to database " + db.database);
+        console.log(" Connected to database " + databaseName);
     }
 });
 
@@ -28,7 +30,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 //app.use('/scripts', express.static(`${__dirname }/node_modules`))
 
-let api = require("./routes/api")(app, express, socket_io);
+let api = require("./app/api")(app, express, socket_io);
 
 app.use("/api", api);
 
@@ -40,6 +42,13 @@ http.listen(port, function(err) {
     }
 });
 
-// app.use("/",(req,res) =>{
-//     res.sendFile(__dirname + "/index.html")
-// }){
+app.use((err, request, response, next) => {
+    response.status(500).send({
+        status: 500,
+        success: false,
+        message: `Something went wrong`,
+        errorMessage: err.message,
+        errorCode: err.errorCode
+    });
+    return false;
+});
