@@ -37,7 +37,7 @@ app.use(express.static(__dirname + "/public"));
 app.use("/npm", express.static(__dirname + "/node_modules"));
 app.use("/bower", express.static(__dirname + "/bower_components"));
 
-alcApp.get("*", function (request, response) {
+app.get("*", function (request, response) {
     response.sendFile(__dirname + "/public/app/views/index.html");
 });
 
