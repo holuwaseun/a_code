@@ -6,7 +6,7 @@ const { authMiddleware, tokenMiddleware } = require(`../middleware/middleware`);
 
 module.exports = (express, socket_io) => {
     const studentRoute = express.Router();
-
+    
     /*
     * CREATE student endpoint
     */
@@ -102,10 +102,7 @@ module.exports = (express, socket_io) => {
         });
     });
 
-    /*
-    * Authentication middleware
-    */
-    studentRoute.use(authMiddleware);
+    
 
 
     /*
